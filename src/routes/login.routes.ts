@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response, Router } from 'express';
-import 'reflect-metadata';
+// import 'reflect-metadata';
 
 interface RequestWithBody extends Request {
   body: { [key: string]: string | undefined };
@@ -16,22 +16,6 @@ function requireAuth(req: Request, res: Response, next: NextFunction): void {
 }
 
 const router = Router();
-
-router.get('/login', (req: Request, res: Response) => {
-  res.send(`
-  <form method='post'>
-    <div>
-      <label>Email</label>
-      <input name="email" />
-    </div>
-    <div>
-      <label>Password</label>
-      <input name="password" type="password"/>
-    </div>
-    <button>Submit </submit>
-  </ form>
-  `);
-});
 
 router.post('/login', (req: RequestWithBody, res: Response) => {
   const { email, password } = req.body;
@@ -72,60 +56,3 @@ router.get('/protected', requireAuth, (req: Request, res: Response) => {
 });
 
 export default router;
-
-// DO NOT WRITE
-
-@controller('/auth')
-class LoginController {
-  @get('/login')
-  getLogin(req: Request, res: Response): void {
-    res.send('form');
-  }
-
-  @use(requireAuth)
-  @post('/login')
-  // @validateBody('email', 'password')
-  postLogin(req: Request, res: Response): void {
-    const { email, password } = req.body;
-
-    if (email && password && email === 'hi@hi.com' && password === 'password') {
-      req.session = { loggedIn: true };
-      res.redirect('/');
-    } else {
-      res.send('Invalid Email or Password');
-    }
-  }
-}
-
-function post(path: string) {
-  return function (target: any, key: string, desc: PropertyDescriptor) {
-    // router.post(path, target[key]);
-    Reflect.defineMetadata('path', path, target, key);
-  };
-}
-function get(path: string) {
-  return function (target: any, key: string, desc: PropertyDescriptor) {
-    // router.post(path, target[key]);
-    Reflect.defineMetadata('path', path, target, key);
-  };
-}
-
-function use(middleware: any) {
-  return function (target: any, key: string, desc: PropertyDescriptor) {
-    // router.addMiddlewareToHandlerWeJustRegistered(middleware);
-  };
-}
-
-function controller(routeName: string) {
-  return function (target: typeof LoginController) {
-    for (const key in target.prototype) {
-      const path = Reflect.getMetadata('path', target.prototype, key);
-      const middleware = Reflect.getMetadata(
-        'middleware',
-        target.prototype,
-        key
-      );
-      router.get(path, target.prototype[key]);
-    }
-  };
-}

@@ -1,5 +1,4 @@
 import { NextFunction, Request, Response, Router } from 'express';
-// import 'reflect-metadata';
 
 interface RequestWithBody extends Request {
   body: { [key: string]: string | undefined };

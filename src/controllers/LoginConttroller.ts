@@ -1,8 +1,9 @@
 import { NextFunction, Request, Response, Router } from 'express';
+import { get } from './decorators/routes';
 
 @controller('/')
 class LoginController {
-  constructor(parameters) {}
+  constructor(parameters: any) {}
 
   @get('/login')
   getLogin (req: Request, res: Response): void {

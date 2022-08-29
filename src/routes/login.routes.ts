@@ -73,7 +73,7 @@ router.get('/protected', requireAuth, (req: Request, res: Response) => {
 export default router;
 
 // DO NOT WRITE
-/*
+
 @controller('/auth')
 class LoginController {
   @get('/login')
@@ -81,9 +81,9 @@ class LoginController {
     res.send('form');
   }
 
+  @use(requireAuth)
   @post('/login')
   @validateBody('email', 'password')
-  @use(requireAuth)
   postLogin(req: Request, res: Response): void {
     const { email, password } = req.body;
 
@@ -95,4 +95,15 @@ class LoginController {
     }
   }
 }
-*/
+
+function post(routeName: string) {
+  return function (target: any, key: string, desc: PropertyDescriptor) {
+    router.post(routeName, target[key]);
+  };
+}
+
+function use(middleware: any) {
+  return function (target: any, key: string, desc: PropertyDescriptor) {
+    //
+  };
+}

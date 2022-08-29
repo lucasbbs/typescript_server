@@ -6,7 +6,17 @@ import { NextFunction, Request, RequestHandler, Response } from 'express';
 
 function bodyValidators(keys: string): RequestHandler {
   return function (req: Request, res: Response, next: NextFunction) {
-    const { body };
+    if (!req.body) {
+      res.status(422).send('Invalid Request');
+      throw new Error('');
+    }
+    for (const key of keys) {
+      if (!req.body[key]) {
+        res.status(422).send('Invalid Request');
+        throw new Error('');
+      }
+    }
+    return next();
   };
 }
 
@@ -28,8 +38,20 @@ export function controller(routePrefix: string) {
         target.prototype,
         key
       );
+
+      const requiredBodyProps =
+        Reflect.getMetadata(MetadataKeys.validator, target.prototype, key) ||
+        [];
+
+      const validator = bodyValidators(requiredBodyProps);
+
       if (path) {
-        router[method](`${routePrefix}${path}`, ...middlewares, routeHandler);
+        router[method](
+          `${routePrefix}${path}`,
+          ...middlewares,
+          validator,
+          routeHandler
+        );
       }
     }
   };

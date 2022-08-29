@@ -1,4 +1,5 @@
 import { NextFunction, Request, Response, Router } from 'express';
+import 'reflect-metadata';
 
 interface RequestWithBody extends Request {
   body: { [key: string]: string | undefined };
@@ -83,7 +84,7 @@ class LoginController {
 
   @use(requireAuth)
   @post('/login')
-  @validateBody('email', 'password')
+  // @validateBody('email', 'password')
   postLogin(req: Request, res: Response): void {
     const { email, password } = req.body;
 
@@ -96,14 +97,35 @@ class LoginController {
   }
 }
 
-function post(routeName: string) {
+function post(path: string) {
   return function (target: any, key: string, desc: PropertyDescriptor) {
-    router.post(routeName, target[key]);
+    // router.post(path, target[key]);
+    Reflect.defineMetadata('path', path, target, key);
+  };
+}
+function get(path: string) {
+  return function (target: any, key: string, desc: PropertyDescriptor) {
+    // router.post(path, target[key]);
+    Reflect.defineMetadata('path', path, target, key);
   };
 }
 
 function use(middleware: any) {
   return function (target: any, key: string, desc: PropertyDescriptor) {
-    //
+    // router.addMiddlewareToHandlerWeJustRegistered(middleware);
+  };
+}
+
+function controller(routeName: string) {
+  return function (target: typeof LoginController) {
+    for (const key in target.prototype) {
+      const path = Reflect.getMetadata('path', target.prototype, key);
+      const middleware = Reflect.getMetadata(
+        'middleware',
+        target.prototype,
+        key
+      );
+      router.get(path, target.prototype[key]);
+    }
   };
 }

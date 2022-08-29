@@ -7,7 +7,11 @@ function logger(req: Request, res: Response, next: NextFunction) {
 
 @controller('/auth')
 class LoginController {
-  // @use(logger)
+  // @get('/')
+  // add(a: number, b: number): number {
+  //   return a + b;
+  // }
+
   @get('/login')
   getLogin(req: Request, res: Response): void {
     res.send(`

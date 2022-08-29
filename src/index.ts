@@ -1,26 +1,31 @@
 import express, { Request, Response } from 'express';
 import loginRoutes from './routes/login.routes';
 import cookieSession from 'cookie-session';
+import { router as controllerRouter } from './controllers/decorators/controller';
 
-// app.use(express.urlencoded({ extended: true }));
-// app.use(cookieSession({ keys: [''] }));
-// app.use(loginRoutes);
+import './controllers/LoginController';
 
-// app.listen(3000, () => console.log('Running on port 3000'));
+const app = express();
+app.use(express.urlencoded({ extended: true }));
+app.use(cookieSession({ keys: ['session'] }));
+app.use(loginRoutes);
+app.use(controllerRouter);
 
-// DO NOT WRITE THAT
+app.listen(3000, () => {
+  console.log('Running on port 3000');
+});
 
-class Server {
-  app: express.Express = express();
-  constructor() {
-    this.app.use(express.urlencoded({ extended: true }));
-    this.app.use(cookieSession({ keys: ['session'] }));
-    this.app.use(loginRoutes);
-  }
+// class Server {
+//
+//   constructor() {
+//     this.app.use(express.urlencoded({ extended: true }));
+//     this.app.use(cookieSession({ keys: ['session'] }));
+//     this.app.use(loginRoutes);
+//   }
 
-  start(): void {
-    this.app.listen(3000, () => console.log('Running on port 3000'));
-  }
-}
+//   start(): void {
+//     this.app.listen(3000, () => console.log('Running on port 3000'));
+//   }
+// }
 
-new Server().start();
+// new Server().start();
